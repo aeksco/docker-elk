@@ -1,6 +1,27 @@
-version: '2'
+version: '2.1'
 
 services:
+
+  expressjs:
+    build: expressjs/
+    ports:
+      - "4000:4000"
+    depends_on:
+      - logstash
+    logging:
+      driver: "syslog"
+      options:
+        syslog-address: "tcp://localhost:5000"
+        syslog-facility: "daemon"
+
+  cerebro:
+    image: yannart/cerebro
+    ports:
+      - "9000:9000"
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch # NOTE - to use point Cerebro to http://elasticsearch:9200
 
   elasticsearch:
     build: elasticsearch/
@@ -40,6 +61,4 @@ services:
       - elasticsearch
 
 networks:
-
   elk:
-    driver: bridge
